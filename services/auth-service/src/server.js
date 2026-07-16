@@ -2,6 +2,7 @@ require("dotenv").config({ path: "../../.env" });
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/auth.routes");
+const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 const PORT = process.env.AUTH_SERVICE_PORT || 4001;
@@ -14,6 +15,8 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/", authRoutes);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`auth-service listening on port ${PORT}`);
