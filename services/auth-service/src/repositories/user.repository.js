@@ -18,4 +18,11 @@ async function create({ name, email, passwordHash, role }) {
   return result.rows[0];
 }
 
-module.exports = { findByEmail, create };
+async function findAll() {
+  const result = await pool.query(
+    "SELECT id, name, email, role, created_at FROM auth.users ORDER BY created_at DESC",
+  );
+  return result.rows;
+}
+
+module.exports = { findByEmail, create, findAll };

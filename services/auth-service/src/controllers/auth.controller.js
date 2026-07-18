@@ -1,5 +1,8 @@
-const { registerUser, loginUser } = require("../services/auth.service");
-const { verifyToken } = require("../utils/jwt");
+const {
+  registerUser,
+  loginUser,
+  listUsers,
+} = require("../services/auth.service");
 
 async function register(req, res, next) {
   try {
@@ -19,17 +22,17 @@ async function login(req, res, next) {
   }
 }
 
-function me(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "missing token" });
-  }
+function me(req, res) {
+  res.json({ user: req.user });
+}
+
+async function listAllUsers(req, res, next) {
   try {
-    const decoded = verifyToken(authHeader.split(" ")[1]);
-    res.json({ user: decoded });
-  } catch {
-    res.status(401).json({ error: "invalid or expired token" });
+    const users = await listUsers();
+    res.json({ users });
+  } catch (err) {
+    next(err);
   }
 }
 
-module.exports = { register, login, me };
+module.exports = { register, login, me, listAllUsers };

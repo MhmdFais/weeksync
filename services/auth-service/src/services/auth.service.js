@@ -48,4 +48,8 @@ async function loginUser({ email, password }) {
   return { user, token };
 }
 
-module.exports = { registerUser, loginUser, AuthError };
+async function listUsers() {
+  return userRepository.findAll();
+}
+
+module.exports = { registerUser, loginUser, listUsers, AuthError };
