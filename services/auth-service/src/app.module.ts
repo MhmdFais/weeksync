@@ -8,7 +8,7 @@ import { JwtConfigModule } from './jwt-config/jwt-config.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '../.env',
+      envFilePath: '.env',
       isGlobal: true,
     }),
     HealthModule,
