@@ -71,4 +71,17 @@ export class AuthService {
 
     return { user: safeUser, token };
   }
+
+  async listUsers() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }
