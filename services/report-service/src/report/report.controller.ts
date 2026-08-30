@@ -22,7 +22,8 @@ export class ReportController {
 
   @Post()
   create(@Req() req: AuthenticatedRequest, @Body() dto: CreateReportDto) {
-    return this.reportService.create(req.user.sub, dto);
+    const token = req.headers.authorization!.split(' ')[1];
+    return this.reportService.create(req.user.sub, dto, token);
   }
 
   @Get()

@@ -2,16 +2,49 @@ import {
   Injectable,
   ForbiddenException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { firstValueFrom } from 'rxjs';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class ReportService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly http: HttpService,
+    private readonly config: ConfigService,
+  ) {}
 
-  create(userId: number, dto: CreateReportDto) {
+  private async validateProjectExists(projectId: string, token: string) {
+    const baseUrl = this.config.get<string>('PROJECT_SERVICE_URL');
+    try {
+      await firstValueFrom(
+        this.http.get(`${baseUrl}/projects/${projectId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      );
+    } catch (err) {
+      if (err instanceof AxiosError && err.response?.status === 404) {
+        throw new BadRequestException(
+          'projectId does not reference an existing project',
+        );
+      }
+      throw new BadRequestException(
+        'unable to validate projectId — project-service unavailable',
+      );
+    }
+  }
+
+  async create(userId: number, dto: CreateReportDto, token: string) {
+    if (dto.projectId) {
+      await this.validateProjectExists(dto.projectId, token);
+    }
+
     return this.prisma.report.create({
       data: {
         userId,
