@@ -10,12 +10,13 @@ import { RolesGuard } from '../auth/guards/roles/roles.guard';
 @Module({
   imports: [
     JwtModule.registerAsync({
-      imports: [ConfigModule, HttpModule],
+      imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET'),
       }),
       inject: [ConfigService],
     }),
+    HttpModule,
   ],
   controllers: [ReportController],
   providers: [ReportService, JwtAuthGuard, RolesGuard],
